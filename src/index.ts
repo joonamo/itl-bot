@@ -18,18 +18,18 @@ export interface Env {
   scoreHistory: KVNamespace
 }
 
-const listApi = "https://itl2023.groovestats.com/api/entrant/leaderboard"
-const scoreKey = "last-scores"
+const listApi = 'https://itl2023.groovestats.com/api/entrant/leaderboard'
+const scoreKey = 'last-scores'
 
-const medals: string[] = ["0", "🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
+const medals: string[] = ['0', '🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
 
 const doIt = async (env: Env) => {
   const players = env.players.map((name) => name.toLocaleLowerCase())
   const scoreData = await env.scoreHistory.get(scoreKey)
-  console.log({scoreData})
+  console.log({ scoreData })
   const lastScores: InterestingPlayerData[] = (scoreData && JSON.parse(scoreData ?? '')) ?? []
 
-  console.log("Calling ITL API")
+  console.log('Calling ITL API')
   const data = await fetch(listApi)
   console.log(`Api call succesful: ${data.ok}, status: ${data.status}`)
   const leaderboardData = await data.json<LeaderboardResponse>()
@@ -53,36 +53,36 @@ const doIt = async (env: Env) => {
   const scorePadding = interestingPlayers[interestingPlayers.length - 1].placement.toString().length
 
   for (const player of interestingPlayers) {
-    const lastScore: Pick<InterestingPlayerData, "localPlacement"> | undefined = lastScores.find(
+    const lastScore: Pick<InterestingPlayerData, 'localPlacement'> | undefined = lastScores.find(
       (lastScore) => lastScore.name === player.name
     )
     const localPlacementDiff = lastScore && lastScore.localPlacement - player.localPlacement
     const changeLabel =
       localPlacementDiff === undefined
-        ? "🆕"
+        ? '🆕'
         : localPlacementDiff > 0
-        ? "⬆️"
+        ? '⬆️'
         : localPlacementDiff < 0
-        ? "⬇️"
-        : "`--`"
+        ? '⬇️'
+        : '`--`'
 
     outputLines.push(
       `${medals[idx] ?? `\`${idx}\``} \`#${player.placement
         .toString()
-        .padEnd(scorePadding)}\` ${changeLabel} ${
+        .padEnd(scorePadding)}\` ${changeLabel} **${
         player.name
-      } (${player.rankingPoints.toLocaleString()} RP)`
+      }** (${player.rankingPoints.toLocaleString()} RP)`
     )
     idx++
   }
-  const content = outputLines.join("\n")
+  const content = outputLines.join('\n')
   console.log(content)
 
-  console.log("Sending webhook...")
+  console.log('Sending webhook...')
   const webhookResult = await fetch(env.webhook, {
-    method: "POST",
+    method: 'POST',
     body: JSON.stringify({ content }),
-    headers: { "content-type": "application/json;charset=UTF-8" },
+    headers: { 'content-type': 'application/json;charset=UTF-8' },
   })
   console.log(`Webhook call succesful: ${webhookResult.ok}, status: ${webhookResult.status}`)
 
@@ -95,7 +95,7 @@ export default {
   },
 
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-    const auth = request.headers.get("authentication")
+    const auth = request.headers.get('authentication')
     if (auth !== env.apiKey) {
       return new Response(null, { status: 403 })
     }
@@ -104,7 +104,7 @@ export default {
 
     return new Response(JSON.stringify({ result }), {
       headers: {
-        "content-type": "application/json;charset=UTF-8",
+        'content-type': 'application/json;charset=UTF-8',
       },
     })
   },
