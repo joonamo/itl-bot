@@ -54,9 +54,8 @@ const doIt = async (env: Env) => {
   const scorePadding = interestingPlayers[interestingPlayers.length - 1].placement.toString().length
 
   for (const player of interestingPlayers) {
-    const lastScore: Pick<InterestingPlayerData, 'localPlacement'> | undefined = lastScores.find(
-      (lastScore) => lastScore.name === player.name
-    )
+    const lastScore: Pick<InterestingPlayerData, 'localPlacement' | 'rankingPoints'> | undefined =
+      lastScores.find((lastScore) => lastScore.name === player.name)
     const localPlacementDiff = lastScore && lastScore.localPlacement - player.localPlacement
     const changeLabel =
       localPlacementDiff === undefined
@@ -67,12 +66,16 @@ const doIt = async (env: Env) => {
         ? env.customEmoji?.down ?? '🔻'
         : '`--`'
 
+    const rpDiff = player.rankingPoints - (lastScore?.rankingPoints ?? 0)
+    const rpDiffString =
+      rpDiff > 0 ? `(${env.customEmoji?.up ?? '🔼'} ${rpDiff.toLocaleString()})` : ''
+
     outputLines.push(
       `${medals[idx] ?? `\`${idx}\``} \`#${player.placement
         .toString()
         .padEnd(scorePadding)}\` ${changeLabel} **${
         player.name
-      }** (${player.rankingPoints.toLocaleString()} RP)`
+      }** - ${player.rankingPoints.toLocaleString()} ${rpDiffString}`
     )
     idx++
   }
