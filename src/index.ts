@@ -96,7 +96,7 @@ export default {
 
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const auth = request.headers.get('authentication')
-    if (auth !== env.apiKey) {
+    if (env.apiKey === '' || auth !== env.apiKey) {
       return new Response(null, { status: 403 })
     }
 

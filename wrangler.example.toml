@@ -1,0 +1,29 @@
+# I think you need to give this globally unique name
+name = "itl-bot-give-me-a-name"
+main = "src/index.ts"
+compatibility_date = "2023-04-09"
+
+# You can create multiple different envs if needed by copying the following lines
+# and renaming dev to something else
+[env.dev]
+kv_namespaces = [
+  # Create KV and put it's id here
+  { binding = "scoreHistory", id = "put-kv-namespace-here" }
+]
+# You can tweak the trigger time as preferred. Default every day at 18:00 UTC
+triggers = {crons = [ "0 18 * * *" ]}
+
+[env.dev.vars]
+# Add your players here, case insensitive
+players = [
+    "list",
+    "your",
+    "players",
+    "here"
+  ]
+# You can create api key so the webhook can be triggered on demand
+# Leave empty for no on-demand triggering
+apiKey = ''
+# Paste your webhook url here
+webhook = 'https://discord.com/api/webhooks/channel_id/secret_key'
+
