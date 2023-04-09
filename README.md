@@ -1,9 +1,9 @@
 # itl-bot
-Bot for posting [ITL 2023 Online](https://itl2023.groovestats.com/) scores to Discord
+Bot for posting [ITL 2023 Online](https://itl2023.groovestats.com/) scores to Discord via webhook
 
 ![Preview image](preview.png)
 
-Bot runs in [CloudFlare Workers](https://workers.cloudflare.com/) and stores historical data in CloudFlare [KV](https://www.cloudflare.com/products/workers-kv/)
+Bot runs in [CloudFlare Workers](https://workers.cloudflare.com/) and stores previous scores in [CloudFlare KV](https://www.cloudflare.com/products/workers-kv/)
 
 ## Deploying
 
