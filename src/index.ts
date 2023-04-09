@@ -14,6 +14,7 @@ export interface Env {
   players: string[]
   apiKey: string
   webhook: string
+  customEmoji?: { up?: string; down?: string; new?: string }
 
   scoreHistory: KVNamespace
 }
@@ -47,7 +48,7 @@ const doIt = async (env: Env) => {
 
   await env.scoreHistory.put(scoreKey, JSON.stringify(interestingPlayers))
 
-  const outputLines: string[] = []
+  const outputLines: string[] = ['💃 Latest ITL 2023 scores 🕺']
   let idx = 1
 
   const scorePadding = interestingPlayers[interestingPlayers.length - 1].placement.toString().length
@@ -59,11 +60,11 @@ const doIt = async (env: Env) => {
     const localPlacementDiff = lastScore && lastScore.localPlacement - player.localPlacement
     const changeLabel =
       localPlacementDiff === undefined
-        ? '🆕'
+        ? env.customEmoji?.new ?? '🆕'
         : localPlacementDiff > 0
-        ? '⬆️'
+        ? env.customEmoji?.up ?? '🔼'
         : localPlacementDiff < 0
-        ? '⬇️'
+        ? env.customEmoji?.down ?? '🔻'
         : '`--`'
 
     outputLines.push(
@@ -71,7 +72,7 @@ const doIt = async (env: Env) => {
         .toString()
         .padEnd(scorePadding)}\` ${changeLabel} **${
         player.name
-      }** (${player.rankingPoints.toLocaleString()} RP)`
+      }** (${player.rankingPoints.toLocaleString()} RP) ${localPlacementDiff}`
     )
     idx++
   }
