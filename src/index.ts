@@ -72,7 +72,7 @@ const doIt = async (env: Env) => {
         .toString()
         .padEnd(scorePadding)}\` ${changeLabel} **${
         player.name
-      }** (${player.rankingPoints.toLocaleString()} RP) ${localPlacementDiff}`
+      }** (${player.rankingPoints.toLocaleString()} RP)`
     )
     idx++
   }
