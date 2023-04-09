@@ -30,6 +30,7 @@ type PlayerData = {
 
 type InterestingPlayerData = PlayerData & {
   placement: number
+  localPlacement: number
 }
 
 type LeaderboardResponse = {

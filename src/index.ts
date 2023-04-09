@@ -14,14 +14,20 @@ export interface Env {
   players: string[]
   apiKey: string
   webhook: string
+
+  scoreHistory: KVNamespace
 }
 
 const listApi = "https://itl2023.groovestats.com/api/entrant/leaderboard"
+const scoreKey = "last-scores"
 
 const medals: string[] = ["0", "🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
 
 const doIt = async (env: Env) => {
   const players = env.players.map((name) => name.toLocaleLowerCase())
+  const scoreData = await env.scoreHistory.get(scoreKey)
+  console.log({scoreData})
+  const lastScores: InterestingPlayerData[] = (scoreData && JSON.parse(scoreData ?? '')) ?? []
 
   console.log("Calling ITL API")
   const data = await fetch(listApi)
@@ -31,18 +37,41 @@ const doIt = async (env: Env) => {
     `Leaderboard data succesful: ${leaderboardData.success}, message: ${leaderboardData.message}`
   )
 
+  let localPlacement = 1
   const interestingPlayers = leaderboardData.data.leaderboard.flatMap<InterestingPlayerData>(
     (player, index) =>
-      players.includes(player.name.toLocaleLowerCase()) ? [{ ...player, placement: index + 1 }] : []
+      players.includes(player.name.toLocaleLowerCase())
+        ? [{ ...player, placement: index + 1, localPlacement: localPlacement++ }]
+        : []
   )
+
+  await env.scoreHistory.put(scoreKey, JSON.stringify(interestingPlayers))
 
   const outputLines: string[] = []
   let idx = 1
+
+  const scorePadding = interestingPlayers[interestingPlayers.length - 1].placement.toString().length
+
   for (const player of interestingPlayers) {
+    const lastScore: Pick<InterestingPlayerData, "localPlacement"> | undefined = lastScores.find(
+      (lastScore) => lastScore.name === player.name
+    )
+    const localPlacementDiff = lastScore && lastScore.localPlacement - player.localPlacement
+    const changeLabel =
+      localPlacementDiff === undefined
+        ? "🆕"
+        : localPlacementDiff > 0
+        ? "⬆️"
+        : localPlacementDiff < 0
+        ? "⬇️"
+        : "`--`"
+
     outputLines.push(
-      `${medals[idx] ?? `${idx}.`} #${player.placement} - ${
+      `${medals[idx] ?? `\`${idx}\``} \`#${player.placement
+        .toString()
+        .padEnd(scorePadding)}\` ${changeLabel} ${
         player.name
-      } - ${player.rankingPoints.toLocaleString()}`
+      } (${player.rankingPoints.toLocaleString()} RP)`
     )
     idx++
   }
@@ -57,7 +86,7 @@ const doIt = async (env: Env) => {
   })
   console.log(`Webhook call succesful: ${webhookResult.ok}, status: ${webhookResult.status}`)
 
-  return outputLines
+  return { outputLines, interestingPlayers }
 }
 
 export default {
