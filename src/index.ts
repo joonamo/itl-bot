@@ -68,14 +68,14 @@ const doIt = async (env: Env) => {
 
     const rpDiff = player.rankingPoints - (lastScore?.rankingPoints ?? 0)
     const rpDiffString =
-      rpDiff > 0 ? `(${env.customEmoji?.up ?? '🔼'} ${rpDiff.toLocaleString()})` : ''
+      rpDiff > 0 ? `(${env.customEmoji?.up ?? '🔼'} ${rpDiff.toLocaleString('fi')})` : ''
 
     outputLines.push(
       `${medals[idx] ?? `\`${idx}\``} \`#${player.placement
         .toString()
         .padEnd(scorePadding)}\` ${changeLabel} **${
         player.name
-      }** - ${player.rankingPoints.toLocaleString()} ${rpDiffString}`
+      }** - ${player.rankingPoints.toLocaleString('fi')} ${rpDiffString}`
     )
     idx++
   }
