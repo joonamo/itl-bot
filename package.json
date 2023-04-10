@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "devDependencies": {
     "@cloudflare/workers-types": "4.20230404.0",
+    "@types/ramda": "^0.28.23",
     "typescript": "5.0.4",
     "wrangler": "2.14.0"
   },
@@ -10,5 +11,8 @@
     "start": "wrangler dev --env dev",
     "deploy-dev": "wrangler publish --env dev",
     "deploy-prod": "wrangler publish --env production"
+  },
+  "dependencies": {
+    "ramda": "0.29.0"
   }
 }

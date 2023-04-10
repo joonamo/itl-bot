@@ -31,6 +31,7 @@ type PlayerData = {
 type InterestingPlayerData = PlayerData & {
   placement: number
   localPlacement: number
+  emoji: string
 }
 
 type LeaderboardResponse = {
