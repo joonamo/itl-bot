@@ -14,22 +14,31 @@ import { splitEvery } from 'ramda'
 
 export interface Env {
   players?: string[]
-  playersByGroup?: { group: string; emoji: string; players: string[] }[]
   apiKey: string
   webhook: string
   customEmoji?: { up?: string; down?: string; new?: string }
+  messageTitle?: string
 
   scoreHistory: KVNamespace
 }
 
 const listApi = 'https://itl2023.groovestats.com/api/entrant/leaderboard'
 const scoreKey = 'last-scores'
+const playersByGroupKey = 'players-by-group'
 
 const medals: string[] = ['0', '🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
 
 const doIt = async (env: Env) => {
-  const players = env.playersByGroup
-    ? env.playersByGroup.flatMap((group) =>
+  const [lastScoreData, playersByGroupData] = await Promise.all([
+    env.scoreHistory.get(scoreKey),
+    env.scoreHistory.get(playersByGroupKey),
+  ])
+
+  const playersByGroup: { group: string; emoji: string; players: string[] }[] | null =
+    playersByGroupData && JSON.parse(playersByGroupData)
+
+  const players = playersByGroup
+    ? playersByGroup.flatMap((group) =>
         group.players.map((player) => ({
           name: player.toLocaleLowerCase(),
           emoji: group.emoji,
@@ -39,8 +48,7 @@ const doIt = async (env: Env) => {
     : env.players
     ? env.players.map((name) => ({ name: name.toLocaleLowerCase(), emoji: '', group: '' }))
     : []
-  const scoreData = await env.scoreHistory.get(scoreKey)
-  const lastScores: InterestingPlayerData[] = (scoreData && JSON.parse(scoreData ?? '')) ?? []
+  const lastScores: InterestingPlayerData[] = (lastScoreData && JSON.parse(lastScoreData ?? '')) ?? []
 
   console.log('Calling ITL API')
   const data = await fetch(listApi)
@@ -109,12 +117,12 @@ const doIt = async (env: Env) => {
 
   const webhookResult = await fetch(env.webhook, {
     method: 'POST',
-    body: JSON.stringify({ content: '💃 Latest ITL 2023 scores 🕺' }),
+    body: JSON.stringify({ content: env.messageTitle ?? '💃 Latest ITL 2023 scores 🕺' }),
     headers: { 'content-type': 'application/json;charset=UTF-8' },
   })
   console.log(`Webhook call succesful: ${webhookResult.ok}, status: ${webhookResult.status}`)
 
-  for (const lines of splitEvery(25, outputLines)) {
+  for (const lines of splitEvery(20, outputLines)) {
     const content = lines.join('\n')
     console.log(content)
 
