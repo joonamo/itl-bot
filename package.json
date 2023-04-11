@@ -10,7 +10,9 @@
   "scripts": {
     "start": "wrangler dev --env dev",
     "deploy-dev": "wrangler publish --env dev",
-    "deploy-prod": "wrangler publish --env production"
+    "deploy-prod": "wrangler publish --env production",
+    "deploy-nordic-cup": "wrangler publish --env nordiccup",
+    "deploy-all": "wrangler publish --env dev && wrangler publish --env production && wrangler publish --env nordiccup"
   },
   "dependencies": {
     "ramda": "0.29.0"
